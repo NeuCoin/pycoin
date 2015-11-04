@@ -1,4 +1,3 @@
-
 from ..encoding import wif_to_secret_exponent
 from ..convention import tx_fee
 
@@ -37,7 +36,7 @@ class LazySecretExponentDB(object):
         return None
 
 
-def create_tx(spendables, payables, fee="standard", lock_time=0, version=1):
+def create_tx(spendables, payables, fee="standard", lock_time=0, version=1, **kwargs):
     """
     This function provides the easiest way to create an unsigned transaction.
 
@@ -97,8 +96,7 @@ def create_tx(spendables, payables, fee="standard", lock_time=0, version=1):
             coin_value = 0
         script = standard_tx_out_script(bitcoin_address)
         txs_out.append(TxOut(coin_value, script))
-
-    tx = Tx(version=version, txs_in=txs_in, txs_out=txs_out, lock_time=lock_time)
+    tx = Tx(version=version, txs_in=txs_in, txs_out=txs_out, lock_time=lock_time, **kwargs)
     tx.set_unspents(spendables)
 
     distribute_from_split_pool(tx, fee)

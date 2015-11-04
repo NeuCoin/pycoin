@@ -78,7 +78,7 @@ class Tx(object):
     @classmethod
     def parse(class_, f):
         """Parse a Bitcoin transaction Tx from the file-like object f."""
-        version, count = parse_struct("LI", f)
+        version, time, count = parse_struct("LLI", f)
         txs_in = []
         for i in range(count):
             txs_in.append(TxIn.parse(f))
@@ -87,7 +87,7 @@ class Tx(object):
         for i in range(count):
             txs_out.append(TxOut.parse(f))
         lock_time, = parse_struct("L", f)
-        return class_(version, txs_in, txs_out, lock_time)
+        return class_(version, txs_in, txs_out, lock_time, time=time)
 
     @classmethod
     def from_hex(class_, hex_string):
@@ -109,8 +109,9 @@ class Tx(object):
         warnings.simplefilter('default', DeprecationWarning)
         return class_.from_hex(hex_string)
 
-    def __init__(self, version, txs_in, txs_out, lock_time=0, unspents=[]):
+    def __init__(self, version, txs_in, txs_out, lock_time=0, unspents=[], **kwargs):
         self.version = version
+        self.time = kwargs["time"] if "time" in kwargs else None
         self.txs_in = txs_in
         self.txs_out = txs_out
         self.lock_time = lock_time
@@ -118,7 +119,10 @@ class Tx(object):
 
     def stream(self, f, blank_solutions=False):
         """Stream a Bitcoin transaction Tx to the file-like object f."""
-        stream_struct("LI", f, self.version, len(self.txs_in))
+        if self.time != None:
+            stream_struct("LLI", f, self.version, self.time, len(self.txs_in))
+        else:
+            stream_struct("LI", f, self.version, len(self.txs_in))
         for t in self.txs_in:
             t.stream(f, blank_solutions=blank_solutions)
         stream_struct("I", f, len(self.txs_out))
@@ -225,7 +229,7 @@ class Tx(object):
         if hash_type & SIGHASH_ANYONECANPAY:
             txs_in = [txs_in[unsigned_txs_out_idx]]
 
-        tmp_tx = Tx(self.version, txs_in, txs_out, self.lock_time)
+        tmp_tx = Tx(self.version, txs_in, txs_out, self.lock_time, time=self.time)
         return from_bytes_32(tmp_tx.hash(hash_type=hash_type))
 
     def solve(self, hash160_lookup, tx_in_idx, tx_out_script, hash_type=SIGHASH_ALL, **kwargs):
