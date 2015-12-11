@@ -46,6 +46,10 @@ do_OP_NOP6 = do_OP_NOP7 = do_OP_NOP8 = do_OP_NOP9 = do_OP_NOP10 = lambda s: None
 def do_OP_0(stack):
     stack.append(VCH_FALSE)
 
+def do_OP_MINT(stack):
+    # TODO add minting
+    stack.append(VCH_FALSE)
+
 def do_OP_VERIFY(stack):
     pass
 
