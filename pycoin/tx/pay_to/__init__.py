@@ -9,10 +9,11 @@ from .ScriptPayToAddress import ScriptPayToAddress
 from .ScriptPayToPublicKey import ScriptPayToPublicKey
 from .ScriptPayToScript import ScriptPayToScript
 from .ScriptMultisig import ScriptMultisig
+from .ScriptColdminting import ScriptColdminting
 from .ScriptUnknown import ScriptUnknown
 from .ScriptNulldata import ScriptNulldata
 
-SUBCLASSES = [ScriptPayToAddress, ScriptPayToPublicKey, ScriptPayToScript, ScriptMultisig, ScriptNulldata, ScriptUnknown]
+SUBCLASSES = [ScriptPayToAddress, ScriptPayToPublicKey, ScriptPayToScript, ScriptMultisig, ScriptColdminting, ScriptNulldata, ScriptUnknown]
 
 
 class SolvingError(Exception):
